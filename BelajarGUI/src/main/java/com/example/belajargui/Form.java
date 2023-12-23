@@ -3,14 +3,12 @@ package com.example.belajargui;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableSet;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
-import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.util.ArrayList;
@@ -40,14 +38,6 @@ public class Form extends Application {
         genderL.setToggleGroup(radioGroup);
         genderP.setToggleGroup(radioGroup);
 
-        // Membuat Split Menu
-        SplitMenuButton splitMenuButton = new SplitMenuButton();
-        splitMenuButton.setText("Pilih");
-        MenuItem menu1 = new MenuItem("Opsi 1");
-        MenuItem menu2 = new MenuItem("Opsi 2");
-        MenuItem menu3 = new MenuItem("Opsi 3");
-        splitMenuButton.getItems().addAll(menu1, menu2, menu3);
-
 
         // Membuat button
         Button addBtn = new Button("Submit");
@@ -76,37 +66,29 @@ public class Form extends Application {
                 new PropertyValueFactory<>("jenisKelamin")
         );
         tabel.getColumns().addAll(kolomNama, kolomNIM, kolomEmail, kolomJenisKelamin);
-        tabel.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        tabel.getColumns().forEach(column -> {
-            column.setResizable(false); // Memastikan kolom tidak dapat diubah ukurannya oleh pengguna
-            column.setReorderable(false); // Optional: Menonaktifkan fitur mengubah urutan kolom
-        });
-        tabel.autosize();
-
-        menu1.setOnAction(e -> {handleMenuItemSelection("Opsi 1");});
-        menu2.setOnAction(e -> {handleMenuItemSelection("Opsi 2");});
-        menu3.setOnAction(e -> {handleMenuItemSelection("Opsi 3");});
 
         addBtn.setOnAction(e -> {
             RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
             String jenisKelamin = "";
-            if(selectedRadioButton != null){
-                jenisKelamin = selectedRadioButton.getText();
-            }
-            String selectedData = splitMenuButton.getText();
-            System.out.println(selectedData);
-            data.add(new Mahasiswa(
-                    fieldNama.getText(),
-                    fieldNIM.getText(),
-                    fieldEmail.getText(),
-                    jenisKelamin
-            ));
+            if(fieldNama.getText().isEmpty() && fieldNIM.getText().isEmpty() && fieldEmail.getText().isEmpty() && selectedRadioButton == null){
+                showAlert();
+            } else {
+                if(selectedRadioButton != null){
+                    jenisKelamin = selectedRadioButton.getText();
+                }
+                data.add(new Mahasiswa(
+                        fieldNama.getText(),
+                        fieldNIM.getText(),
+                        fieldEmail.getText(),
+                        jenisKelamin
+                ));
 
-            // Membersihkan form
-            fieldNama.clear();
-            fieldNIM.clear();
-            fieldEmail.clear();
-            radioGroup.selectToggle(null);
+                // Membersihkan form
+                fieldNama.clear();
+                fieldNIM.clear();
+                fieldEmail.clear();
+                radioGroup.selectToggle(null);
+            }
         });
 
         updateBtn.setOnAction(event -> {
@@ -121,7 +103,13 @@ public class Form extends Application {
             tabel.refresh();
             clearFields(fieldNama, fieldNIM, fieldEmail);
             radioGroup.selectToggle(null);
+        });
 
+        deleteBtn.setOnAction(e -> {
+            Mahasiswa selectedMahasiswa = tabel.getSelectionModel().getSelectedItem();
+            if(selectedMahasiswa != null){
+                data.remove(selectedMahasiswa);
+            }
         });
 
         HBox boxBtn = new HBox(10);
@@ -140,7 +128,6 @@ public class Form extends Application {
         gridPane.add(labelJenisKelamin, 0, 3);
         gridPane.add(genderL, 0, 4);
         gridPane.add(genderP, 0, 5);
-        gridPane.add(splitMenuButton, 0,6 );
         gridPane.add(boxBtn, 1, 7);
 
         HBox hbox = new HBox();
@@ -168,5 +155,13 @@ public class Form extends Application {
 
     private void handleMenuItemSelection(String selectedItem){
         System.out.println(selectedItem);
+    }
+
+    private void showAlert(){
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Information");
+        alert.setContentText("Masukin Data terlebih dahulu");
+
+        alert.showAndWait();
     }
 }
