@@ -40,7 +40,16 @@ public class Form extends Application {
         genderL.setToggleGroup(radioGroup);
         genderP.setToggleGroup(radioGroup);
 
-        // Membuat button untuk submit
+        // Membuat Split Menu
+        SplitMenuButton splitMenuButton = new SplitMenuButton();
+        splitMenuButton.setText("Pilih");
+        MenuItem menu1 = new MenuItem("Opsi 1");
+        MenuItem menu2 = new MenuItem("Opsi 2");
+        MenuItem menu3 = new MenuItem("Opsi 3");
+        splitMenuButton.getItems().addAll(menu1, menu2, menu3);
+
+
+        // Membuat button
         Button addBtn = new Button("Submit");
         Button updateBtn = new Button("Update");
         Button deleteBtn = new Button("Delete");
@@ -74,12 +83,18 @@ public class Form extends Application {
         });
         tabel.autosize();
 
+        menu1.setOnAction(e -> {handleMenuItemSelection("Opsi 1");});
+        menu2.setOnAction(e -> {handleMenuItemSelection("Opsi 2");});
+        menu3.setOnAction(e -> {handleMenuItemSelection("Opsi 3");});
+
         addBtn.setOnAction(e -> {
             RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
             String jenisKelamin = "";
             if(selectedRadioButton != null){
                 jenisKelamin = selectedRadioButton.getText();
             }
+            String selectedData = splitMenuButton.getText();
+            System.out.println(selectedData);
             data.add(new Mahasiswa(
                     fieldNama.getText(),
                     fieldNIM.getText(),
@@ -87,25 +102,26 @@ public class Form extends Application {
                     jenisKelamin
             ));
 
-            updateBtn.setOnAction(event -> {
-                Mahasiswa selectedMahasiswa = tabel.getSelectionModel().getSelectedItem();
-                if(selectedMahasiswa != null){
-                    selectedMahasiswa.setNama(fieldNama.getText());
-                    selectedMahasiswa.setNim(fieldNIM.getText());
-                    selectedMahasiswa.setEmail(fieldEmail.getText());
-                    selectedMahasiswa.setJenisKelamin(selectedRadioButton.getText());
-                }
-                tabel.refresh();
-                clearFields(fieldNama, fieldNIM, fieldEmail);
-                radioGroup.selectToggle(null);
-
-            });
-
             // Membersihkan form
             fieldNama.clear();
             fieldNIM.clear();
             fieldEmail.clear();
             radioGroup.selectToggle(null);
+        });
+
+        updateBtn.setOnAction(event -> {
+            Mahasiswa selectedMahasiswa = tabel.getSelectionModel().getSelectedItem();
+            RadioButton selectedRadioButton = (RadioButton) radioGroup.getSelectedToggle();
+            if(selectedMahasiswa != null){
+                selectedMahasiswa.setNama(fieldNama.getText());
+                selectedMahasiswa.setNim(fieldNIM.getText());
+                selectedMahasiswa.setEmail(fieldEmail.getText());
+                selectedMahasiswa.setJenisKelamin(selectedRadioButton.getText());
+            }
+            tabel.refresh();
+            clearFields(fieldNama, fieldNIM, fieldEmail);
+            radioGroup.selectToggle(null);
+
         });
 
         HBox boxBtn = new HBox(10);
@@ -124,8 +140,8 @@ public class Form extends Application {
         gridPane.add(labelJenisKelamin, 0, 3);
         gridPane.add(genderL, 0, 4);
         gridPane.add(genderP, 0, 5);
-        gridPane.add(boxBtn, 1, 6);
-        gridPane.add(tabel, 0, 7);
+        gridPane.add(splitMenuButton, 0,6 );
+        gridPane.add(boxBtn, 1, 7);
 
         HBox hbox = new HBox();
         hbox.getChildren().add(tabel);
@@ -148,5 +164,9 @@ public class Form extends Application {
         for(TextField field : fields){
             field.clear();
         }
+    }
+
+    private void handleMenuItemSelection(String selectedItem){
+        System.out.println(selectedItem);
     }
 }
